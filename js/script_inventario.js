@@ -674,7 +674,15 @@ function cargarFiltros() {
     filtroMarca.innerHTML = '<option value="">Todas</option>';
     filtroDispo.innerHTML = '<option value="">Todas</option>';
 
-    const tipos = [...new Set(lista_instrumento.map(i => i.tipo))];
+
+    let tipos = []; // arreglo donde guardaremos los tipos únicos
+    for (let i = 0; i < lista_instrumento.length; i++) {
+        let tipoActual = lista_instrumento[i].tipo;
+        // si el tipo aún no está en el array, lo agregamos
+        if (tipos.indexOf(tipoActual) === -1) {
+            tipos.push(tipoActual);
+        }
+    }
     tipos.forEach(tipo => {
         const option = document.createElement("option");
         option.value = tipo;
@@ -685,7 +693,15 @@ function cargarFiltros() {
     // Este se actualizará dinámicamente luego según tipo
     actualizarMarcasPorTipo(); 
 
-    const disponibilidad = [...new Set(lista_instrumento.map(i => i.disponibilidad))];
+
+    let disponibilidad = []; // arreglo donde guardaremos los tipos únicos
+    for (let i = 0; i < lista_instrumento.length; i++) {
+        let dispo = lista_instrumento[i].disponibilidad;
+        // si el tipo aún no está en el array, lo agregamos
+        if (disponibilidad.indexOf(dispo) === -1) {
+            disponibilidad.push(dispo);
+        }
+    }
     disponibilidad.forEach(valor => {
         const option = document.createElement("option");
         option.value = valor;
@@ -700,14 +716,28 @@ function actualizarMarcasPorTipo() {
 
     let marcas;
     if (tipoSeleccionado === "") {
-        marcas = [...new Set(lista_instrumento.map(i => i.marca))];
+        //marcas = [...new Set(lista_instrumento.map(i => i.marca))];
+        let todasLasMarcas = lista_instrumento.map(function (i) { return i.marca; });
+        // 2. Filtrar duplicados
+        let sinDuplicados = [];
+        todasLasMarcas.forEach(function (m) {
+        if (sinDuplicados.indexOf(m) === -1) sinDuplicados.push(m);
+        });
+        // 3. Asignar
+        marcas = sinDuplicados;
     } else {
-        marcas = [...new Set(
-            lista_instrumento
-                .filter(i => i.tipo === tipoSeleccionado)
-                .map(i => i.marca)
-        )];
-    }
+        marcas = [];
+        for (let i = 0; i < lista_instrumento.length; i++) {
+            let instrumento = lista_instrumento[i];
+            // 1) mismo tipo que el seleccionado
+            if (instrumento.tipo === tipoSeleccionado) {
+                // 2) si la marca no está todavía en el array, la agregamos
+                if (marcas.indexOf(instrumento.marca) === -1) {
+                marcas.push(instrumento.marca);
+                }
+            }
+            }
+        }
 
     marcas.forEach(marca => {
         const option = document.createElement("option");
